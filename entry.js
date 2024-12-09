@@ -15,10 +15,15 @@ class Server extends routeFlux{
         this.httpRef = routeFlux.http.createServer((req, res) => {
 
             handlers.forEach(handler => {
-                if(handler.url === req.url){
-                    //challenge (:
+                if(handler.url === req.url.split('?')[0].split('/')[1]){
+
                     routeFlux.serversLog.forEach((server) => {
-                        server.id === this.id && server.reqLog.push(req);
+                        server.serverId === this.id && server.reqLog.push({
+                            url: req.url,
+                            method: req.method,
+                            body: req.body
+                        });
+                        console.log(server.reqLog)
                     })
                     handler.callback(req, res);
                 }
@@ -46,11 +51,11 @@ class handler{
 }
 
 function test(){
-    let home = new handler("GET", "/", (req, res) => {
+    let home = new handler("GET", "", (req, res) => {
         res.setHeader("Content-Type", "text/plain");
         res.end("Hello World");
     })
-    let about = new handler("GET", "/about", (req, res) => {
+    let about = new handler("GET", "about", (req, res) => {
         res.setHeader("Content-Type", "text/plain");
         res.end("about world");
     })
